@@ -1,104 +1,47 @@
-###Taquillas de Cine - Simulación de Sincronización en Java
-Este proyecto es un ejercicio práctico de programación concurrente en Java. Simula el sistema de venta de entradas de un cine, gestionando la concurrencia entre múltiples clientes (hilos productores) y varias taquillas (hilos consumidores) que compiten por recursos limitados (entradas y espacio en colas).
+# Taquillas de Cine - Simulación de Sincronización en Java
 
-#📋 Descripción del Proyecto
-El sistema simula un cine con un aforo limitado y varias colas de espera.
+Este proyecto implementa una simulación concurrente de un sistema de venta de entradas de cine utilizando **Java Threads**, **Semáforos** y **Monitores**. El objetivo es gestionar el acceso concurrente de múltiples clientes a colas limitadas y controlar el aforo total del cine mediante taquillas sincronizadas.
 
-Clientes: Llegan periódicamente y eligen una cola al azar. Si la cola está llena, se marchan.
+## 📋 Descripción
 
-Taquillas: Atienden a los clientes de las colas. Tardan un tiempo en procesar la venta.
+El sistema simula el flujo de clientes que intentan comprar entradas en un cine con las siguientes características:
+* **Aforo limitado:** Controlado estrictamente para no vender más entradas de las permitidas.
+* **Múltiples colas:** Los clientes eligen una cola aleatoria. Si la cola está llena, el cliente desiste y se marcha.
+* **Taquillas independientes:** Varias taquillas atienden a los clientes concurrentemente, procesando la venta (simulando un tiempo de espera).
 
-Venta: Al finalizar la atención, la taquilla intenta vender una entrada. Si el cine está lleno (aforo completo), el cliente se queda sin entrada.
+## 📂 Estructura del Proyecto
 
-#🛠️ Estructura del Código
-El proyecto está organizado en el paquete com.ejercicios.sincronizacion y consta de las siguientes clases principales:
+El código se encuentra en el paquete `com.ejercicios.sincronizacion`.
 
-SimulacionCine:
+| Clase | Responsabilidad |
+| :--- | :--- |
+| **`SimulacionCine`** | Clase principal (`main`). Inicia la simulación, crea las taquillas y genera el flujo de clientes durante un tiempo determinado. |
+| **`Cine`** | Recurso compartido (Monitor). Gestiona las listas de clientes (colas), controla el aforo global y sincroniza el acceso. |
+| **`Taquilla`** | Hilo consumidor (`Runnable`). Atiende a los clientes de las colas y procesa las ventas. |
+| **`Cliente`** | Hilo productor (`Thread`). Intenta entrar en una de las colas del cine. |
 
-Clase principal (main).
+## ⚙️ Mecanismos de Sincronización
 
-Configura los parámetros de la simulación (número de taquillas, aforo, colas, tiempos).
+El proyecto demuestra el uso de varios mecanismos clave de concurrencia:
 
-Inicia los hilos de las taquillas.
+1.  **Semáforo (`Semaphore`)**:
+    * Ubicado en la clase `Cine` (`semaforoAforo`).
+    * Se inicializa con el `TOTAL_ASIENTOS`.
+    * Se utiliza `tryAcquire()` para asegurar que no se vendan más entradas que el aforo permitido, garantizando la exclusión mutua en el conteo final.
 
-Genera hilos de Cliente durante un tiempo determinado (TIEMPO_SIMULACION).
+2.  **Monitores (`synchronized`, `wait`, `notifyAll`)**:
+    * **Protección de Colas**: Los métodos `ponerseEnCola` y `atenderCliente` son `synchronized` para proteger la integridad de las listas `ArrayList`.
+    * **Coordinación**:
+        * Las taquillas esperan (`wait()`) si no hay clientes en las colas.
+        * Cuando un cliente entra en una cola, notifica (`notifyAll()`) a las taquillas para que se despierten y procesen la venta.
 
-Muestra las estadísticas finales.
+## 🚀 Configuración
 
-Cine:
+Los parámetros de la simulación son constantes modificables en `SimulacionCine.java`:
 
-Actúa como el recurso compartido (Monitor).
-
-Gestiona las listas de espera (colas de clientes).
-
-Controla el aforo mediante un Semáforo (Semaphore).
-
-Utiliza métodos synchronized, wait() y notifyAll() para gestionar el acceso concurrente a las colas.
-
-Taquilla:
-
-Implementa Runnable.
-
-Representa a un taquillero que saca clientes de las colas y procesa la venta.
-
-Simula el tiempo de procesamiento con Thread.sleep().
-
-Cliente:
-
-Extiende de Thread.
-
-Representa a una persona que intenta ponerse en una de las colas del cine.
-
-#⚙️ Mecanismos de Sincronización
-El ejercicio implementa varios conceptos clave de la concurrencia:
-
-Semáforos (Semaphore):
-
-Utilizado en la clase Cine (semaforoAforo) para controlar estrictamente el número total de entradas vendidas según el aforo total.
-
-tryAcquire() se usa para intentar vender una entrada de forma atómica.
-
-Monitores (synchronized, wait, notifyAll):
-
-Acceso a Colas: Los métodos ponerseEnCola y atenderCliente están sincronizados para evitar corrupciones de datos en las listas.
-
-Coordinación: Las taquillas usan wait() cuando no hay clientes, esperando a que llegue alguien. Los clientes usan notifyAll() al entrar en una cola para despertar a las taquillas.
-
-Gestión de Hilos:
-
-Uso de Thread para clientes y Runnable para taquillas.
-
-Interrupción controlada de hilos al finalizar la simulación.
-
-#🚀 Configuración de la Simulación
-Puedes ajustar los parámetros de la simulación en las constantes de la clase SimulacionCine.java:
-
-Java
-
-static final int NUM_TAQUILLAS = 5;       // Número de hilos taquilla
-static final int TOTAL_ASIENTOS = 10;     // Aforo total (permisos del semáforo)
-static final int NUM_COLAS = 4;           // Número de colas disponibles
-static final int MAX_PERSONAS_COLA = 5;   // Capacidad máxima por cola
-static final int TASA_LLEGADA_CLIENTES = 50; // Milisegundos entre cada nuevo cliente
-public static final int TIEMPO_VENTA_MIN = 2000; // Tiempo mín. de atención
-public static final int TIEMPO_VENTA_MAX = 3000; // Tiempo máx. de atención
-#📊 Estadísticas
-Al finalizar la ejecución, el programa muestra un resumen:
-
-Entradas vendidas: Total de clientes que consiguieron entrar.
-
-Clientes sin entrada (Aforo): Clientes que fueron atendidos pero el cine ya estaba lleno.
-
-Clientes que se fueron (Cola llena): Clientes que llegaron pero encontraron su cola llena y desistieron.
-
-#📦 Requisitos y Ejecución
-Java JDK: 17 o superior (configurado en el pom.xml).
-
-Maven: Para la gestión de dependencias y construcción.
-
-Para ejecutar desde la terminal:
-
-Bash
-
-mvn clean compile exec:java -Dexec.mainClass="com.ejercicios.sincronizacion.SimulacionCine"
-O simplemente ejecuta la clase SimulacionCine como una Java Application desde tu IDE (Eclipse, IntelliJ, etc.).
+```java
+static final int NUM_TAQUILLAS = 5;       // Hilos atendiendo
+static final int TOTAL_ASIENTOS = 10;     // Capacidad máxima del cine
+static final int NUM_COLAS = 4;           // Número de filas disponibles
+static final int MAX_PERSONAS_COLA = 5;   // Longitud máxima de cada fila
+static final int TASA_LLEGADA_CLIENTES = 50; // Frecuencia de llegada (ms)
