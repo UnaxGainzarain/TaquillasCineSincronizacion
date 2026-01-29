@@ -1,6 +1,6 @@
 package com.ejercicios.sincronizacion;
 
-public class Cliente {
+public class Cliente extends Thread{
 	private int id;
     private Cine cine;
 
@@ -9,9 +9,14 @@ public class Cliente {
         this.cine = cine;
     }
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
+	  @Override
+	    public void run() {
+	        
+	        cine.ponerseEnCola(this);
+	    }
 
 	public void setId(int id) {
 		this.id = id;

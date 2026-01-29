@@ -1,8 +1,8 @@
 package com.ejercicios.sincronizacion;
 
 public class SimulacionCine {
-	 static final int NUM_TAQUILLAS = 1;
-	    static final int TOTAL_ASIENTOS = 5;
+	 static final int NUM_TAQUILLAS = 5;
+	    static final int TOTAL_ASIENTOS = 10;
 	    static final int NUM_COLAS = 4;           
 	    static final int MAX_PERSONAS_COLA = 5;  
 	    
@@ -31,17 +31,31 @@ public class SimulacionCine {
         int idCliente = 1;
         
         try {
-			while(System.currentTimeMillis()<TIEMPO_SIMULACION) {
+			while(System.currentTimeMillis()<tiempoFin) {
 				Cliente c = new Cliente(idCliente ++, cine);
+				c.start();
 				Thread.sleep(TASA_LLEGADA_CLIENTES);
+			}
 				System.out.println("\n--- FIN DEL TIEMPO DE ENTRADA. CERRANDO PUERTAS... ---");
 	            Thread.sleep(2000); 
-			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
         
-        
+      //Parar las Taquillas 
+        for (Thread t : hilosTaquillas) {
+            t.interrupt();
+        }
+
+        // Mostrar resultados finales
+        try {
+            // Pequeña espera para asegurar que los hilos cierran sus mensajes
+            Thread.sleep(1000);
+            cine.mostrarEstadisticas();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 	}
 
 }
