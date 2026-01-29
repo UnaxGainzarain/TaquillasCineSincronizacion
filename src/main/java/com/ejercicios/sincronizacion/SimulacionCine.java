@@ -25,7 +25,22 @@ public class SimulacionCine {
             hilosTaquillas[i] = new Thread(t);
             hilosTaquillas[i].start();
         }
-
+        
+        //Generador de Clientes (Hilo Productor en el main)
+        long tiempoFin = System.currentTimeMillis() + TIEMPO_SIMULACION;
+        int idCliente = 1;
+        
+        try {
+			while(System.currentTimeMillis()<TIEMPO_SIMULACION) {
+				Cliente c = new Cliente(idCliente ++, cine);
+				Thread.sleep(TASA_LLEGADA_CLIENTES);
+				System.out.println("\n--- FIN DEL TIEMPO DE ENTRADA. CERRANDO PUERTAS... ---");
+	            Thread.sleep(2000); 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        
 	}
 
 }
