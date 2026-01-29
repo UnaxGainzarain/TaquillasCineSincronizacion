@@ -78,4 +78,10 @@ public class Cine {
         }
         return true; 
     }
+    
+    public synchronized void mostrarEstadisticas() {
+        System.out.println("Entradas vendidas: " + entradasVendidas);
+        System.out.println("Clientes sin entrada (Aforo): " + clientesSinEntrada);
+        System.out.println("Clientes que se fueron (Cola llena): " + clientesPerdidosCola);
+    } 
 }

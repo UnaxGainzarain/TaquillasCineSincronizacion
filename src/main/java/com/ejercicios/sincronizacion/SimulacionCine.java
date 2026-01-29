@@ -41,6 +41,7 @@ public class SimulacionCine {
 			e.printStackTrace();
 		}
         
+        
 	}
 
 }
