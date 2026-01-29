@@ -14,6 +14,17 @@ public class SimulacionCine {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		Cine cine = new Cine(TOTAL_ASIENTOS, NUM_COLAS, MAX_PERSONAS_COLA);
+        System.out.println("--- INICIO SIMULACIÓN CINE ---");
+        System.out.println("Aforo: " + TOTAL_ASIENTOS + " | Colas: " + NUM_COLAS);
+        
+        Thread[] hilosTaquillas = new Thread[NUM_TAQUILLAS];
+        
+        for (int i = 0; i < NUM_TAQUILLAS; i++) {
+            Taquilla t = new Taquilla(cine, "Taquilla-" + (i + 1));
+            hilosTaquillas[i] = new Thread(t);
+            hilosTaquillas[i].start();
+        }
 
 	}
 
